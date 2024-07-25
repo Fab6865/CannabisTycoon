@@ -1,0 +1,790 @@
+<html><head><base href="https://www.monting.fr/21923-large_default/montre-festina-f20364-2.jpg%20montre%20en%20or"><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cannabis Tycoon</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #1a1a1a;
+        color: #f0f0f0;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .game-area {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    .plantation, .inventory, .market, .shop, .finance, .luxury {
+        background-color: #2a2a2a;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .plantation {
+        width: 100%;
+    }
+    .inventory, .market, .shop, .finance, .luxury {
+        width: calc(50% - 20px);
+    }
+    h2 {
+        color: #4CAF50;
+    }
+    button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    button:disabled {
+        background-color: #45a049;
+        cursor: not-allowed;
+    }
+    .plant {
+        width: 80px;
+        height: 120px;
+        background-color: #3a3a3a;
+        border-radius: 5px;
+        margin: 5px;
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+    }
+    .plant-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 0%;
+        background-color: #4CAF50;
+        transition: height 0.5s;
+    }
+    .plant-info {
+        position: relative;
+        z-index: 1;
+        padding: 2px;
+        text-align: center;
+        font-size: 12px;
+    }
+    .plant-actions {
+        position: absolute;
+        bottom: 2px;
+        left: 2px;
+        right: 2px;
+        display: flex;
+        justify-content: space-between;
+    }
+    .plant-actions button {
+        padding: 2px;
+        font-size: 10px;
+    }
+    #money, #xp, #level {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    #plant-selection {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .plant-option {
+        background-color: #3a3a3a;
+        border-radius: 5px;
+        padding: 5px;
+        margin-bottom: 5px;
+        width: calc(20% - 5px);
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 12px;
+    }
+    .plant-option:hover {
+        background-color: #4a4a4a;
+    }
+    .plant-option.selected {
+        background-color: #4CAF50;
+    }
+    .client {
+        background-color: #3a3a3a;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+    .boost-timer {
+        font-size: 14px;
+        color: #ffa500;
+        margin-left: 10px;
+    }
+    input[type="number"] {
+        width: 100px;
+        padding: 5px;
+        margin-right: 10px;
+    }
+    .trend-indicator {
+        font-weight: bold;
+        margin-left: 10px;
+    }
+    .trend-up {
+        color: #4CAF50;
+    }
+    .trend-down {
+        color: #f44336;
+    }
+    #save-load {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+    }
+    .upgrade-btn {
+        background-color: #FFA500;
+        font-size: 10px;
+        padding: 2px 5px;
+    }
+    #logo-container {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    #logo {
+        width: 200px;
+        height: 200px;
+        object-fit: contain;
+    }
+    .plant-image {
+        width: 80px;
+        height: 80px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 5px;
+        margin-bottom: 5px;
+    }
+    #plants {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+    .plot {
+        width: 100%;
+        height: 120px;
+        background-color: #3a3a3a;
+        border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+    }
+    .plot.empty {
+        border: 2px dashed #4CAF50;
+    }
+    .plot.empty:hover {
+        background-color: #4a4a4a;
+    }
+    .plot.locked {
+        background-color: #555;
+        cursor: not-allowed;
+    }
+    .plot.locked::after {
+        content: '🔒';
+        font-size: 24px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .plot.buyable {
+        border: 2px solid #FFA500;
+    }
+    .plot.buyable::after {
+        content: 'Acheter';
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #FFA500;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-size: 12px;
+    }
+    #xp-bar {
+        width: 100%;
+        height: 20px;
+        background-color: #333;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        overflow: hidden;
+    }
+    #xp-progress {
+        width: 0%;
+        height: 100%;
+        background-color: #4CAF50;
+        transition: width 0.5s;
+    }
+    .luxury-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .luxury-item img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        margin-right: 10px;
+        border-radius: 5px;
+    }
+    .luxury-item-info {
+        flex-grow: 1;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div id="logo-container">
+        <img id="logo" src="https://t3.ftcdn.net/jpg/05/42/52/52/360_F_542525274_BnAHFiH3HOnchvXrFFvWjHZXzTa6d5y1.jpg" alt="Cannabis Tycoon Logo">
+    </div>
+    <h1>Cannabis Tycoon</h1>
+    <div id="money">Argent: 1000€</div>
+    <div id="level">Niveau: 1</div>
+    <div id="xp-bar"><div id="xp-progress"></div></div>
+    <div id="xp">XP: 0 / 100</div>
+<div id="save-load">
+    <button onclick="saveGame()">Sauvegarder la partie</button>
+    <button onclick="loadGame()">Charger la partie</button>
+</div>
+
+    <div class="game-area">
+        <div class="plantation">
+            <h2>Plantation</h2>
+            <div id="plant-selection"></div>
+            <div id="plants"></div>
+        </div>
+        <div class="inventory">
+            <h2>Inventaire</h2>
+            <div id="inventory"></div>
+        </div>
+        <div class="market">
+            <h2>Marché</h2>
+            <div id="clients"></div>
+        </div>
+        <div class="shop">
+            <h2>Boutique</h2>
+            <button id="speed-boost">Boost de vitesse (500€)</button>
+            <span id="speed-boost-timer" class="boost-timer"></span>
+            <br>
+            <button id="yield-boost">Boost de rendement (750€)</button>
+            <span id="yield-boost-timer" class="boost-timer"></span>
+            <br>
+            <button id="hire-employee">Embaucher un employé (1000€)</button>
+            <span id="employee-timer" class="boost-timer"></span>
+        </div>
+        <div class="finance">
+            <h2>Marché Financier</h2>
+            <div id="stocks"></div>
+        </div>
+        <div class="luxury">
+            <h2>Produits de Luxe</h2>
+            <div id="luxury-items"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    const plantTypes = [
+        { name: "Indica", growthTime: 60000, yield: 5, cost: 100, level: 1, upgradeCost: 500, image: "https://www.shutterstock.com/image-photo/big-flowering-cannabis-plant-colored-600nw-2138759361.jpg" },
+        { name: "Sativa", growthTime: 90000, yield: 7, cost: 150, level: 1, upgradeCost: 750, image: "https://sensiseeds.com/blog/wp-content/uploads/2022/04/Mexican-Sativa-scaled.jpg" },
+        { name: "Ruderalis", growthTime: 45000, yield: 3, cost: 80, level: 1, upgradeCost: 400, image: "https://www.dinafem.org/uploads/ruderalis2.jpg" },
+        { name: "Hybrid", growthTime: 75000, yield: 6, cost: 120, level: 1, upgradeCost: 600, image: "https://sensiseeds.com/blog/wp-content/uploads/2022/09/9-Best-Hybrid-Strains-scaled.jpg" },
+        { name: "CBD", growthTime: 80000, yield: 4, cost: 90, level: 1, upgradeCost: 450, image: "https://www.usinenouvelle.com/mediatheque/9/0/7/000989709_896x598_c.jpg" }
+    ];
+
+    const clientNames = ["Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Henry", "Isabelle", "Jack"];
+
+    let money = 1000;
+    let xp = 0;
+    let level = 1;
+    let inventory = {};
+    let plants = new Array(10).fill(null);
+    let plotStatus = [
+        'unlocked', 'unlocked', 'unlocked', 'unlocked', 'unlocked',
+        'locked', 'locked', 'locked', 'locked', 'locked'
+    ];
+    let activeBoosts = {};
+    let employeeActive = false;
+    let selectedPlantIndex = 0;
+
+    const plotUnlockPrice = 5000; // Prix pour débloquer une parcelle
+
+    function updateMoney() {
+        $('#money').text(`Argent: ${money}€`);
+        updateLogo();
+    }
+
+    function updateXP() {
+        const xpToNextLevel = level * 100;
+        $('#xp').text(`XP: ${xp} / ${xpToNextLevel}`);
+        $('#xp-progress').css('width', `${(xp / xpToNextLevel) * 100}%`);
+        updateLogo();
+
+        if (xp >= xpToNextLevel) {
+            levelUp();
+        }
+    }
+
+    function levelUp() {
+        level++;
+        xp = 0;
+        $('#level').text(`Niveau: ${level}`);
+        updateXP();
+        alert(`Félicitations ! Vous avez atteint le niveau ${level} !`);
+    }
+
+    function updateLogo() {
+        const logo = $('#logo');
+        const scale = Math.min(1 + (level / 20), 1.5);
+        const rotation = Math.min((money % 360) / 10, 15); // Limiter la rotation à 15 degrés maximum
+        logo.css('transform', `scale(${scale}) rotate(${rotation}deg)`);
+    }
+
+    function updateInventory() {
+        $('#inventory').empty();
+        for (const [type, amount] of Object.entries(inventory)) {
+            $('#inventory').append(`<p>${type}: ${amount}</p>`);
+        }
+    }
+
+    function renderPlantSelection() {
+        $('#plant-selection').empty();
+        plantTypes.forEach((plant, index) => {
+            $('#plant-selection').append(`
+                <div class="plant-option ${index === selectedPlantIndex ? 'selected' : ''}" onclick="selectPlant(${index})">
+                    <div class="plant-image" style="background-image: url('${plant.image}')"></div>
+                    <p>${plant.name} (Niv. ${plant.level})</p>
+                    <p>Coût: ${plant.cost}€</p>
+                    <p>Temps: ${plant.growthTime / 1000}s</p>
+                    <p>Rdt: ${plant.yield}g</p>
+                    <button class="upgrade-btn" onclick="upgradePlant(${index})">Améliorer (${plant.upgradeCost}€)</button>
+                </div>
+            `);
+        });
+    }
+
+    function selectPlant(index) {
+        selectedPlantIndex = index;
+        renderPlantSelection();
+    }
+
+   function upgradePlant(index) {
+    const plant = plantTypes[selectedPlantIndex];
+    if (money >= plant.upgradeCost) {
+        money -= plant.upgradeCost;
+        plant.level++;
+        plant.yield = Math.round(plant.yield * 1.2);
+        plant.growthTime = Math.round(plant.growthTime * 0.9);
+        plant.upgradeCost = Math.round(plant.upgradeCost * 1.5);
+        updateMoney();
+        renderPlantSelection();
+        // Mettre à jour les plantes existantes avec les nouvelles valeurs
+        plants.forEach((p, i) => {
+            if (p && p.type.name === plant.name) {
+                p.type = plant;
+            }
+        });
+    } else {
+        alert("Pas assez d'argent pour améliorer cette plante!");
+    }
+}
+
+
+    function plantOnPlot(index) {
+        if (plotStatus[index] === 'locked') {
+            if (money >= plotUnlockPrice) {
+                money -= plotUnlockPrice;
+                plotStatus[index] = 'unlocked';
+                updateMoney();
+                renderPlants();
+            } else {
+                alert(`Pas assez d'argent pour débloquer cette parcelle! (${plotUnlockPrice}€)`);
+            }
+        } else if (plants[index] === null) {
+            const selectedType = plantTypes[selectedPlantIndex];
+            if (money >= selectedType.cost) {
+                const plant = { type: selectedType, progress: 0, watered: false };
+                plants[index] = plant;
+                money -= selectedType.cost;
+                updateMoney();
+                growPlant(plant, index);
+                renderPlants();
+            } else {
+                alert("Pas assez d'argent pour planter cette variété!");
+            }
+        } else {
+            if (plants[index].progress >= 100) {
+                harvestPlant(index);
+            } else if (!plants[index].watered) {
+                waterPlant(index);
+            }
+        }
+    }
+
+    function waterPlant(index) {
+        if (!plants[index].watered) {
+            plants[index].watered = true;
+            renderPlants();
+        }
+    }
+
+    function harvestPlant(index) {
+        if (plants[index].progress >= 100) {
+            const plant = plants[index];
+            const yieldAmount = plant.type.yield * (activeBoosts.yield ? 1.5 : 1);
+            inventory[plant.type.name] = (inventory[plant.type.name] || 0) + yieldAmount;
+            xp += yieldAmount;
+            updateXP();
+            updateInventory();
+            plants[index] = null;
+            renderPlants();
+        }
+    }
+
+    function growPlant(plant, index) {
+        const growthTime = plant.type.growthTime * (activeBoosts.speed ? 0.75 : 1);
+        const interval = setInterval(() => {
+            if (plants[index] === null) {
+                clearInterval(interval);
+                return;
+            }
+            plant.progress += 1;
+            if (plant.progress >= 100) {
+                clearInterval(interval);
+            }
+            renderPlants();
+        }, growthTime / 100);
+    }
+
+    function renderPlants() {
+        $('#plants').empty();
+        plants.forEach((plant, index) => {
+            if (plotStatus[index] === 'locked') {
+                $('#plants').append(`
+                    <div class="plot locked" onclick="plantOnPlot(${index})">
+                        <span>Débloquer (${plotUnlockPrice}€)</span>
+                    </div>
+                `);
+            } else if (plant === null) {
+                $('#plants').append(`
+                    <div class="plot empty" onclick="plantOnPlot(${index})">
+                        <span>Planter</span>
+                    </div>
+                `);
+            } else {
+                $('#plants').append(`
+                    <div class="plot" onclick="plantOnPlot(${index})">
+                        <div class="plant">
+                            <div class="plant-progress" style="height: ${plant.progress}%"></div>
+                            <div class="plant-info">
+                                <div class="plant-image" style="background-image: url('${plant.type.image}')"></div>
+                                <p>${plant.type.name} (Niv. ${plant.type.level})</p>
+                                <p>${plant.progress}%</p>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            }
+        });
+    }
+
+    function generateClients() {
+        $('#clients').empty();
+        for (let i = 0; i < 3; i++) {
+            generateClient(i);
+        }
+    }
+
+    function generateClient(index) {
+        const clientName = clientNames[Math.floor(Math.random() * clientNames.length)];
+        const type = plantTypes[Math.floor(Math.random() * plantTypes.length)].name;
+        const baseAmount = Math.floor(Math.random() * 3) + 1; // 1 à 3g
+        const amount = baseAmount * Math.floor(1 + (level - 1) / 10); // Augmente tous les 10 niveaux
+        const price = Math.floor(Math.random() * 300) + 200; // 200 à 500 euros
+        $('#clients').append(`
+            <div class="client" id="client-${index}">
+                <p>${clientName} veut ${amount}g de ${type} pour ${price} euros</p>
+                <button onclick="sellTo(${index}, '${type}', ${amount}, ${price})">Vendre</button>
+            </div>
+        `);
+    }
+
+    function sellTo(clientIndex, type, amount, price) {
+        if (inventory[type] >= amount) {
+            inventory[type] -= amount;
+            const revenue = price;
+            money += revenue;
+            xp += amount;
+            updateMoney();
+            updateXP();
+            updateInventory();
+            $(`#client-${clientIndex}`).remove();
+            generateClient(clientIndex);
+        } else {
+            alert("Pas assez de stock pour cette vente !");
+        }
+    }
+
+    function startBoostTimer(boostType) {
+        let timeLeft = 300; // 5 minutes in seconds
+        const timerElement = $(`#${boostType}-boost-timer`);
+        
+        const timerInterval = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.text(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerElement.text('');
+                $(`#${boostType}-boost`).prop('disabled', false);
+                activeBoosts[boostType] = false;
+            }
+            timeLeft--;
+        }, 1000);
+    }
+
+    $('#speed-boost, #yield-boost').click(function() {
+        const boostType = $(this).attr('id').split('-')[0];
+        const cost = boostType === 'speed' ? 500 : 750;
+        if (money >= cost) {
+            money -= cost;
+            updateMoney();
+            activeBoosts[boostType] = true;
+            $(this).prop('disabled', true);
+            startBoostTimer(boostType);
+        } else {
+            alert("Pas assez d'argent pour acheter ce boost!");
+        }
+    });
+
+    $('#hire-employee').click(function() {
+        const cost = 1000;
+        if (money >= cost && !employeeActive) {
+            money -= cost;
+            updateMoney();
+            employeeActive = true;
+            $(this).prop('disabled', true);
+            startEmployeeTimer();
+            autoSell();
+        } else if (employeeActive) {
+            alert("Un employé est déjà actif!");
+        } else {
+            alert("Pas assez d'argent pour embaucher un employé!");
+        }
+    });
+
+    function startEmployeeTimer() {
+        let timeLeft = 300; // 5 minutes in seconds
+        const timerElement = $('#employee-timer');
+        
+        const timerInterval = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.text(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerElement.text('');
+                $('#hire-employee').prop('disabled', false);
+                employeeActive = false;
+            }
+            timeLeft--;
+        }, 1000);
+    }
+
+    function autoSell() {
+        if (employeeActive) {
+            $('.client').each((index, client) => {
+                const sellButton = $(client).find('button');
+                if (!sellButton.prop('disabled')) {
+                    sellButton.click();
+                }
+            });
+            setTimeout(autoSell, 5000); // Vérifier toutes les 5 secondes
+        }
+    }
+
+    const stocks = [
+        { name: "CannaCorp", price: 100, volatility: 0.1, owned: 0, history: [] },
+        { name: "GreenGrow", price: 75, volatility: 0.15, owned: 0, history: [] },
+        { name: "HempTech", price: 50, volatility: 0.2, owned: 0, history: [] }
+    ];
+
+    function updateStocks() {
+        $('#stocks').empty();
+        stocks.forEach((stock, index) => {
+            stock.price *= (1 + (Math.random() - 0.5) * stock.volatility);
+            stock.price = Math.max(0.01, Math.min(1000, stock.price)); // Limiter le prix entre 0.01 et 1000
+            stock.price = Math.round(stock.price * 100) / 100;
+            stock.history.push(stock.price);
+            if (stock.history.length > 30) { // Garder l'historique des 5 dernières minutes (30 mises à jour à 10 secondes d'intervalle)
+                stock.history.shift();
+            }
+            const trend = calculateTrend(stock.history);
+            $('#stocks').append(`
+                <div>
+                    <p>${stock.name}: ${stock.price}€ (Possédé: ${stock.owned}) 
+                    <span class="trend-indicator ${trend > 0 ? 'trend-up' : 'trend-down'}">
+                        ${trend > 0 ? '↑' : '↓'}
+                    </span></p>
+                    <input type="number" id="buy-amount-${index}" min="1" value="1">
+                    <button onclick="buyStock(${index})">Acheter</button>
+                    <input type="number" id="sell-amount-${index}" min="1" max="${stock.owned}" value="1">
+                    <button onclick="sellStock(${index})">Vendre</button>
+                </div>
+            `);
+        });
+    }
+
+    function calculateTrend(history) {
+        if (history.length < 2) return 0;
+        const recentPrice = history[history.length - 1];
+        const oldPrice = history[0];
+        return recentPrice > oldPrice ? 1 : -1;
+    }
+
+    function buyStock(index) {
+        const amount = parseInt($(`#buy-amount-${index}`).val());
+        const totalCost = stocks[index].price * amount;
+        if (money >= totalCost) {
+            money -= totalCost;
+            stocks[index].owned += amount;
+            updateMoney();
+            updateStocks();
+        } else {
+            alert("Pas assez d'argent pour acheter ces actions!");
+        }
+    }
+
+    function sellStock(index) {
+        const amount = parseInt($(`#sell-amount-${index}`).val());
+        if (stocks[index].owned >= amount) {
+            const totalGain = stocks[index].price * amount;
+            money += totalGain;
+            stocks[index].owned -= amount;
+            updateMoney();
+            updateStocks();
+        } else {
+            alert("Vous n'avez pas assez d'actions à vendre!");
+        }
+    }
+
+    const luxuryItems = [
+        { name: "Montre en or", price: 50000, image: "https://www.monting.fr/21923-large_default/montre-festina-f20364-2.jpg" },
+        { name: "Voiture de sport", price: 250000, image: "https://c8.alamy.com/compfr/2aprpnh/bruxelles-9-janvier-2020-audi-lms-voiture-de-sport-gt-2-presentee-au-salon-automobile-bruxelles-autosalon-2020-2aprpnh.jpg" },
+        { name: "Yacht", price: 1000000, image: "https://xclusiveyachts.com/photo/blog/257/webp/720/1.webp" },
+        { name: "Villa de luxe", price: 5000000, image: "https://www.turkeyexpert.com/content/villas/10708/1modern-villas-with-private-pool-and-garage-close-to-the2.jpg" },
+        { name: "Île privée", price: 50000000, image: "https://i.f1g.fr/media/eidos/orig/2016/01/13/PHO9bcee780-728d-11e5-bc5c-ab3afdd5fdfa-805x453.jpg" }
+    ];
+
+    function renderLuxuryItems() {
+        $('#luxury-items').empty();
+        luxuryItems.forEach((item, index) => {
+            $('#luxury-items').append(`
+                <div class="luxury-item">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="luxury-item-info">
+                        <p>${item.name}: ${item.price}€</p>
+                        <button onclick="buyLuxuryItem(${index})">Acheter</button>
+                    </div>
+                </div>
+            `);
+        });
+    }
+
+    function buyLuxuryItem(index) {
+        if (money >= luxuryItems[index].price) {
+            money -= luxuryItems[index].price;
+            inventory[luxuryItems[index].name] = (inventory[luxuryItems[index].name] || 0) + 1;
+            updateMoney();
+            updateInventory();
+            alert(`Félicitations ! Vous avez acheté ${luxuryItems[index].name} !`);
+        } else {
+            alert("Pas assez d'argent pour acheter cet article de luxe!");
+        }
+    }
+// Fonction de sauvegarde
+function saveGame() {
+    const gameData = {
+        money,
+        xp,
+        level,
+        inventory,
+        plants: plants.map(plant => plant ? {
+            type: plant.type.name,
+            progress: plant.progress,
+            watered: plant.watered
+        } : null),
+        plotStatus,
+        activeBoosts,
+        employeeActive
+    };
+    localStorage.setItem('gameData', JSON.stringify(gameData));
+    alert('Partie sauvegardée !');
+}
+
+// Fonction de chargement
+function loadGame() {
+    const gameData = JSON.parse(localStorage.getItem('gameData'));
+    if (gameData) {
+        money = gameData.money;
+        xp = gameData.xp;
+        level = gameData.level;
+        inventory = gameData.inventory;
+        plants = gameData.plants.map(plant => plant ? {
+            type: plantTypes.find(p => p.name === plant.type),
+            progress: plant.progress,
+            watered: plant.watered
+        } : null);
+        plotStatus = gameData.plotStatus;
+        activeBoosts = gameData.activeBoosts;
+        employeeActive = gameData.employeeActive;
+
+        updateMoney();
+        updateXP();
+        renderPlantSelection();
+        renderPlants();
+        updateInventory();
+        generateClients();
+        updateStocks();
+        renderLuxuryItems();
+    } else {
+        alert('Aucune sauvegarde trouvée !');
+    }
+}
+
+
+
+
+    setInterval(generateClients, 60000); // Générer de nouveaux clients toutes les minutes
+    setInterval(updateStocks, 10000); // Mettre à jour les stocks toutes les 10 secondes
+
+    // Initialisation
+    updateMoney();
+    updateXP();
+    updateInventory();
+    renderPlantSelection();
+    renderPlants();
+    generateClients();
+    updateStocks();
+    renderLuxuryItems();
+</script>
+</body></html>
